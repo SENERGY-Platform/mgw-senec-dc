@@ -2,7 +2,7 @@ FROM python:3-slim-buster
 
 LABEL org.opencontainers.image.source https://github.com/SENERGY-Platform/mgw-senec-dc
 
-RUN apt-get update && apt-get install git -y
+RUN apt-get update && apt-get install git gcc -y
 
 WORKDIR /usr/src/app
 
