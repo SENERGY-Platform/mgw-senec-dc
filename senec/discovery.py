@@ -50,11 +50,11 @@ class Discovery(threading.Thread):
         for host in subnet:
             hosts.append(str(host))
 
-        host_port = Scanner.scan(hosts=hosts, num_workers=conf.Discovery.num_workers,
+        detected = Scanner.scan(hosts=hosts, num_workers=conf.Discovery.num_workers,
                                  timeout=conf.Discovery.timeout)
 
         hosts = str(conf.Discovery.ip_list).split(',')
-        for host, _ in host_port:
+        for host in detected:
             hosts.append(host)
 
         unique_hosts: Dict[str, any] = {}
@@ -85,20 +85,20 @@ class Discovery(threading.Thread):
 
     async def _refresh_devices(self):
         try:
-            kasa_devices = await self.get_senec_devices()
+            senec = await self.get_senec_devices()
             stored_devices = self._device_manager.get_devices()
 
-            new_devices, missing_devices, existing_devices = diff(stored_devices, kasa_devices)
+            new_devices, missing_devices, existing_devices = diff(stored_devices, senec)
             if new_devices:
                 for device_id in new_devices:
-                    self._device_manager.handle_new_device(kasa_devices[device_id])
+                    self._device_manager.handle_new_device(senec[device_id])
             if missing_devices:
                 for device_id in missing_devices:
                     self._device_manager.handle_missing_device(stored_devices[device_id])
             if existing_devices:
                 for device_id in existing_devices:
                     self._device_manager.handle_existing_device(stored_devices[device_id])
-            self._device_manager.set_devices(devices=kasa_devices)
+            self._device_manager.set_devices(devices=senec)
         except Exception as ex:
             logger.error("refreshing devices failed - {}".format(ex))
 

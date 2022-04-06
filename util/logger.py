@@ -41,7 +41,7 @@ date_fmt = '%m.%d.%Y %I:%M:%S %p'
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter(fmt=msg_fmt, datefmt=date_fmt))
 
-logger = logging.getLogger("kasa-dc")
+logger = logging.getLogger("senec-dc")
 logger.propagate = False
 logger.addHandler(handler)
 
