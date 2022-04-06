@@ -56,6 +56,7 @@ class Conf:
     class Senergy:
         dt_box = "urn:infai:ses:device-type:afe50ee4-8588-4505-a019-33b1d947a3bf"
         events_energy_seconds = 10
+        service_energy = "energy"
 
 conf = Conf()
 

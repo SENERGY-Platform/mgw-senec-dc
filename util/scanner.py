@@ -59,7 +59,7 @@ class ScanWorker(Thread):
                 return
 
             try:
-                resp = requests.get(host, timeout=self.timeout)
+                resp = requests.get(f'http://{host}', timeout=self.timeout)
                 if not resp.ok or not resp.text.startswith("<!DOCTYPE html><title>SENEC"):
                     break
                 with self.list_lock:
