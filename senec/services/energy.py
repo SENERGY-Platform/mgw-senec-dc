@@ -21,10 +21,10 @@ import rfc3339
 from util import SenecDevice
 
 
-async def handle_energy(device: SenecDevice, *args, **kwargs) -> typing.Dict:
+def handle_energy(device: SenecDevice, *args, **kwargs) -> typing.Dict:
     senec = device.get_senec()
 
-    await senec.update()
+    senec.update()
     time = datetime.datetime.now()
     resp = {
         "state": senec.system_state,

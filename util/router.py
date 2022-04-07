@@ -16,7 +16,6 @@
 
 __all__ = ("Router",)
 
-import asyncio
 import time
 import typing
 from queue import Queue
@@ -52,13 +51,10 @@ class Router(Thread):
 
     def run(self) -> None:
         logger.info("starting {} ...".format(self.name))
-        asyncio.run(self.run_tasks())
-
-    async def run_tasks(self):
         while True:
             try:
                 device_id, service, payload, is_event = self.tasks.get()
-                await self.__command_callback(device_id, service, payload, is_event)
+                self.__command_callback(device_id, service, payload, is_event)
                 self.tasks.task_done()
             except Exception as e:
                 logger.error(str(e))

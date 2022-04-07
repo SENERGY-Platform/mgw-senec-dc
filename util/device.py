@@ -17,16 +17,17 @@
 import typing
 
 import mgw_dc.dm
-import pysenec
 
 __all__ = ("SenecDevice",)
 
+from senec import senec
+
 
 class SenecDevice(mgw_dc.dm.Device):
-    def __init__(self, id: str, name: str, type: str, senec_device: pysenec.Senec, state: typing.Optional[str] = None,
+    def __init__(self, id: str, name: str, type: str, senec_device: senec.Senec, state: typing.Optional[str] = None,
                  attributes=None):
         super().__init__(id, name, type, state, attributes)
         self._senec_device = senec_device
 
-    def get_senec(self) -> pysenec.Senec:
+    def get_senec(self) -> senec.Senec:
         return self._senec_device

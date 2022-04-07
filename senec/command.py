@@ -36,7 +36,7 @@ class Command:
         self.mqtt_client = mqtt_client
         self.device_manager = device_manager
 
-    async def execute_command(self, device_id: str, service: str, payload: typing.AnyStr, is_event: bool = False):
+    def execute_command(self, device_id: str, service: str, payload: typing.AnyStr, is_event: bool = False):
         logger.debug(device_id)
         if not is_event:
             payload = json.loads(payload)
@@ -53,7 +53,7 @@ class Command:
         if device_id not in self.device_manager.get_devices():
             logger.error("Unimplemented service " + service)
         try:
-            result = await command_handlers[service](self.device_manager.get_devices()[device_id], payload)
+            result = command_handlers[service](self.device_manager.get_devices()[device_id], payload)
         except Exception as ex:
             logger.error("Command failed: {}".format(ex))
             return

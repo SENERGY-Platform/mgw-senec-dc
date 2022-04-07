@@ -14,16 +14,14 @@
    limitations under the License.
 """
 
-import asyncio
 import ipaddress
 import threading
 import time
 from typing import Dict, List
 
-import aiohttp as aiohttp
-import pysenec
 from mgw_dc.dm import device_state
 
+import senec
 from util import get_logger, conf, diff, SenecDevice
 
 __all__ = ("Discovery",)
@@ -41,7 +39,7 @@ class Discovery(threading.Thread):
         self._device_manager = device_manager
 
     @staticmethod
-    async def get_senec_devices() -> Dict[str, SenecDevice]:
+    def get_senec_devices() -> Dict[str, SenecDevice]:
         logger.info("Starting scan")
         devices: Dict[str, SenecDevice] = {}
 
@@ -64,12 +62,12 @@ class Discovery(threading.Thread):
         for host in hosts:
             unique_hosts[host] = {}
 
-        devs: Dict[str, pysenec.Senec] = {}
+        devs: Dict[str, senec.Senec] = {}
         for ip in unique_hosts.keys():
             if len(ip) == 0: continue
             try:
-                dev = pysenec.Senec(ip, aiohttp.ClientSession())
-                await dev.read_senec_v21_all()
+                dev = senec.Senec(ip)
+                dev.read_senec_v21_all()
                 devs[ip] = dev
             except Exception as e:
                 logger.warning(f"Could not discover device with ip {ip} : {e}")
@@ -86,9 +84,9 @@ class Discovery(threading.Thread):
         logger.info("Discovered " + str(len(devices)) + " devices")
         return devices
 
-    async def _refresh_devices(self):
+    def _refresh_devices(self):
         try:
-            senec = await self.get_senec_devices()
+            senec = self.get_senec_devices()
             stored_devices = self._device_manager.get_devices()
 
             new_devices, missing_devices, existing_devices = diff(stored_devices, senec)
@@ -107,13 +105,10 @@ class Discovery(threading.Thread):
 
     def run(self) -> None:
         logger.info("starting {} ...".format(self.name))
-        asyncio.run(self.discovery_loop())
-
-    async def discovery_loop(self):
-        await self._refresh_devices()
+        self._refresh_devices()
         last_discovery = time.time()
         while True:
             if time.time() - last_discovery > conf.Discovery.scan_delay:
                 last_discovery = time.time()
-                await self._refresh_devices()
+                self._refresh_devices()
             time.sleep(conf.Discovery.scan_delay / 100)  # at most 1 % too late

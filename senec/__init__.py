@@ -17,8 +17,10 @@
 
 from .command import *
 from .discovery import *
+from .senec import *
 
 __all__ = (
     command.__all__,
     discovery.__all__,
+    senec.__all__,
 )
