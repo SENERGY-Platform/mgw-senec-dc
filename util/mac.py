@@ -22,6 +22,6 @@ def parse_mac(bytes: List[int]) -> str:
     mac = ""
     for b in bytes:
         if len(mac) > 0:
-            mac = "-" + mac
+            mac = mac + "-"
         mac = mac + f'{b:0>2X}'
     return mac
