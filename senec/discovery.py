@@ -45,10 +45,13 @@ class Discovery(threading.Thread):
         logger.info("Starting scan")
         devices: Dict[str, SenecDevice] = {}
 
-        subnet = ipaddress.ip_network(conf.Discovery.subnet)
         hosts: List[str] = []
-        for host in subnet:
-            hosts.append(str(host))
+        try:
+            subnet = ipaddress.ip_network(conf.Discovery.subnet)
+            for host in subnet:
+                hosts.append(str(host))
+        except Exception as e:
+            logger.info(f'Skipping range scan, could not setup: {e}')
 
         detected = Scanner.scan(hosts=hosts, num_workers=conf.Discovery.num_workers,
                                  timeout=conf.Discovery.timeout)
@@ -69,7 +72,7 @@ class Discovery(threading.Thread):
                 await dev.read_senec_v21_all()
                 devs[ip] = dev
             except Exception as e:
-                logger.warning("Could not discover device with ip " + ip)
+                logger.warning(f"Could not discover device with ip {ip} : {e}")
         for addr, dev in devs.items():
             mac = parse_mac(dev._raw["WIZARD"]["MAC_ADDRESS_BYTES"])
             logger.info("Discovered '" + mac + "' at " + dev.host)
